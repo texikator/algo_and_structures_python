@@ -10,25 +10,54 @@
 """
 
 from random import random
+
+
 l_border = input('Левая граница: ')
 r_border = input('Правая граница: ')
 
-result_type = input('Нужно целое (1)  или вещественное (2) число в заданном интервале? :')
+try:
+    l_border = int(l_border)
+    r_border = int(r_border)
 
-if instance(a, str)
-if l_border > r_border:
-    max = l_border
-    min = r_border
-elif r_border > l_border:
-    max = r_border
-    min = l_border
+except ValueError: 
+    pass
+
+
+def rnd(l_border, r_border, result_type):
+    if l_border > r_border:
+        max = l_border
+        min = r_border
+
+    elif r_border > l_border:
+        max = r_border
+        min = l_border
+    else:
+        return False
+
+    if result_type == 1:
+        rnd = int(random() * (max - min) + min)
+
+    elif result_type == 2:
+        rnd = random() * (max - min) + min
+
+    return rnd
+
+
+if isinstance(l_border, str) and isinstance(r_border,str):
+
+    l_border = ord(l_border)
+    r_border = ord(r_border)    
+
+    print(f'Случайный символ в интервал {chr(rnd(l_border, r_border, 1))}')
+
+elif isinstance(l_border, int) and isinstance(r_border, int):
+
+    result_type = int(input(
+        'Нужно целое (1)  или вещественное (2) число в заданном интервале? :'))
+    print(f'Случайное число в заданном интервале {rnd(l_border, r_border, result_type)}')
+
+
 else:
-    print('Границы равны')
-    quit()
-
-if result_type == 1:
-    rnd = int(random*(max - min) + min)
-elif result_type ==2:
-    rnd = random*(max - min ) + min
+    print('Ошибка ввода.')
 
 
