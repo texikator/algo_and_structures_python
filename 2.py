@@ -1,94 +1,84 @@
 """
-2. Написать два алгоритма нахождения i-го по счёту простого числа.
-Без использования «Решета Эратосфена»;
-Используя алгоритм «Решето Эратосфена»
+2. Написать программу сложения и умножения двух шестнадцатеричных чисел.
+При этом каждое число представляется как массив, элементы которого это цифры
+числа. Например, пользователь ввёл A2 и C4F. Сохранить их как [‘A’, ‘2’] и
+[‘C’, ‘4’, ‘F’] соответственно. Сумма чисел из примера: [‘C’, ‘F’, ‘1’],
+произведение - [‘7’, ‘C’, ‘9’, ‘F’, ‘E’].
 """
 
-import math, timeit, sys
+from collections import deque
+from collections import Counter
 
-sys.setrecursionlimit(100000)
-# #без решета, рекурсия
-# def find_simple(num_count=10, finded=[], number=3):
-#     #print('N ',number)
-#     for i in range(2, int(math.sqrt(number))+1):
-#         #print('i ', i)
-#         if number % i == 0:
-#             break
-#     else:
-#          finded.append(number)
-#          print(number, end=" ")
-#          #print(finded)
-#          #print("sdfsdf", len(finded))
-#     number += 2         
+number_one = input('Введите число 1')
+number_two = input('Введите число 2')
 
-#     if len(finded) == num_count:
-#         return finded
-#     else:
-#         return find_simple(num_count, finded, number)
+one = deque(number_one)
+two = deque(number_two)
+#print(number_one)
 
 
+def hex_digit_add(one, two, tmp='0',  result=deque(), position=-2):
 
-#без решета, без рекурсии
-def get_simple(num_count=100, number=2):
-    finded = []
-    simple_count = 0
-    while simple_count < num_count:
-        
-        div = 2
-        
-        while 2 <= div <= int(math.sqrt(number))+1:
-
-            if number % div == 0 and number != div:
-                break
-            div += 1
-            
+    if position == -2:
+        if len(one) > len(two):
+            position = len(one)
         else:
-            finded.append(number)
-            simple_count += 1
-     
-        number += 1
-    return finded
+            position = len(two)
+
+    if position == 0 and tmp == '1':
+        sum = hex(int(tmp, 16))
+    else:
+        sum = hex(int(one.pop(), 16) + int(two.pop(), 16) + int(tmp, 16))
+
+    if len(str(sum)[2:]) > 1:
+        result.appendleft(str(sum)[-1])
+        tmp = '1'
+    else:
+        result.appendleft(str(sum)[-1])
+        tmp = '0'
+
+    position -= 1
+
+    if position <= 0 and tmp == '0':
+        return result
+    else:
+        return hex_digit_add(one, two, tmp,  result, position)
+
+
+print(hex_digit_add(one, two))
 
 
 
-#num_count = int(input('Введите номер числа: '))
-num_count  = 500
-simple_numbers = get_simple(num_count)
-
-print(f' Метод 1: заданное число: {simple_numbers[-1]} ')
-print(f'Метод 1: Список простых чисел: {simple_numbers}')
 
 
-n = int(input('Введите границу вычисление'))
+# def hex_summ(array, tmp='', result=[], position=-1):
+#     internal = []
+#     if position < 0:
+#         for item in array:
+#             if len(item) > position:
+#                 position = len(item)
+#     internal = [[0 for i in range(position)] for i in range(len(array))]
 
-def eratos(n=800):
-    finded = []
-    a = [i for i in range(1,n+1)]
-    a[0] = 0
+#     for j in range(len(array)):
+#         for i in range(position):
+#             #print(i, len(array[i]))
+#             if i >= position - len(array[j]):
+#                 #print(j,i,  i-len(array[j]), array[j][i-len(array[j])])
+#                 internal[j][i] = array[j][i-len(array[j])+1]
+#             print(i, j)
 
-    number = 1
-    step =1 
-    while number < n:
-        
-        if a[number] !=0:
-            finded.append(a[number])    
-            step = a[number]
-            #print(f'число в списке {a[number]} ,шаг {step}')
-            for div in range(a[number] ** 2, n+1, step):
-                a[div-1] = 0
-            
-        number += 1
-        
-#    for i in a:
-#        if a > 0:
-#            finded.append(a)
-    return finded
+#     for i in reversed(range(position)):
+#         summ = 0x0
+#         for j in range(len(array)):
+#             #print(internal[j][i], end =" ")
+#             summ += hex(int(internal[j][i], 16))
+#             print(summ, tmp)
+#             #if len(hex(int(summ,16))[2:]) == 2:
+#             #    tmp = summ[1:-1]
+#         print(summ)    
 
-print(print(f'Метод 2: Список простых чисел: {eratos(n)}'))
+#     return internal           
+#
 
+#print(hex_summ([['b','a'],['b','f','a']]))
 
-print(timeit.timeit('get_simple()', setup='from __main__ import get_simple', number=100))
-print(timeit.timeit('eratos()', setup='from __main__ import eratos', number=100))
-
-# 0.17245420000000067
-# 0.04399160000000002
