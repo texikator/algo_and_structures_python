@@ -1,84 +1,124 @@
 """
-2. Написать программу сложения и умножения двух шестнадцатеричных чисел.
-При этом каждое число представляется как массив, элементы которого это цифры
-числа. Например, пользователь ввёл A2 и C4F. Сохранить их как [‘A’, ‘2’] и
-[‘C’, ‘4’, ‘F’] соответственно. Сумма чисел из примера: [‘C’, ‘F’, ‘1’],
-произведение - [‘7’, ‘C’, ‘9’, ‘F’, ‘E’].
+2. Создать пользовательский класс данных (или использовать) один из классов,
+реализованных в курсе Python.Основы. Реализовать класс с применением слотов
+и обычным способом. Для объекта обычного класса проверить отображение словаря
+атрибутов. Сравнить, сколько выделяется памяти для хранения атрибутов обоих
+классов.
 """
-
-from collections import deque
-from collections import Counter
-
-number_one = input('Введите число 1')
-number_two = input('Введите число 2')
-
-one = deque(number_one)
-two = deque(number_two)
-#print(number_one)
-
-
-def hex_digit_add(one, two, tmp='0',  result=deque(), position=-2):
-
-    if position == -2:
-        if len(one) > len(two):
-            position = len(one)
-        else:
-            position = len(two)
-
-    if position == 0 and tmp == '1':
-        sum = hex(int(tmp, 16))
-    else:
-        sum = hex(int(one.pop(), 16) + int(two.pop(), 16) + int(tmp, 16))
-
-    if len(str(sum)[2:]) > 1:
-        result.appendleft(str(sum)[-1])
-        tmp = '1'
-    else:
-        result.appendleft(str(sum)[-1])
-        tmp = '0'
-
-    position -= 1
-
-    if position <= 0 and tmp == '0':
-        return result
-    else:
-        return hex_digit_add(one, two, tmp,  result, position)
-
-
-print(hex_digit_add(one, two))
-
-
-
-
-
-# def hex_summ(array, tmp='', result=[], position=-1):
-#     internal = []
-#     if position < 0:
-#         for item in array:
-#             if len(item) > position:
-#                 position = len(item)
-#     internal = [[0 for i in range(position)] for i in range(len(array))]
-
-#     for j in range(len(array)):
-#         for i in range(position):
-#             #print(i, len(array[i]))
-#             if i >= position - len(array[j]):
-#                 #print(j,i,  i-len(array[j]), array[j][i-len(array[j])])
-#                 internal[j][i] = array[j][i-len(array[j])+1]
-#             print(i, j)
-
-#     for i in reversed(range(position)):
-#         summ = 0x0
-#         for j in range(len(array)):
-#             #print(internal[j][i], end =" ")
-#             summ += hex(int(internal[j][i], 16))
-#             print(summ, tmp)
-#             #if len(hex(int(summ,16))[2:]) == 2:
-#             #    tmp = summ[1:-1]
-#         print(summ)    
-
-#     return internal           
+# 
+# .__dict__
+# {'_health': 100, 'name': 'sitkh1', '_armor': 1.3, '_damage': 30}
+# {'_health': 105, 'name': 'Luk', '_armor': 1.8, '_damage': 20}
+# память - 536
+# со слотами - 344 если их прописать только в родительком классе или только в дочерних классах и 248 если прописать их и там и там,
+#  экономия в 2+ раза. Использование слотов в классе, описывающем взаимодействие классов игроков не влияет на использование памяти.
+#
+# Если прописать слоты для родительского или дочернего классов, __dict__ для них выдает пустой словарь, при прописании слотов и там и там __dict__ отсутствует
+#  и наблюдается максимальная эффективность 
+#
+# если слоты явно не указаны на всех уровнях наследования, автоматом присутствует __dict__ ?
+# 
+#  Задача - 1
+# Ранее мы с вами уже писали игру, используя словари в качестве
+# структур данных для нашего игрока и врага, давайте сделаем новую, но уже с ООП
+# Опишите базовый класс Person, подумайте какие общие данные есть и у врага и у игрока
+# Не забудьте, что у них есть помимо общих аттрибутов и общие методы.
+# Теперь наследуясь от Person создайте 2 класса Player, Enemy.
+# У каждой сущности должы быть аттрибуты health, damage, armor
+# У каждой сущности должно быть 2 метода, один для подсчета урона, с учетом брони противника,
+# второй для атаки противника.
+# Функция подсчета урона должна быть инкапсулирована
+# Вам надо описать игровой цикл так же через класс.
+# Создайте экземпляры классов, проведите бой. Кто будет атаковать первым оставляю на ваше усмотрение.
+#
 #
 
-#print(hex_summ([['b','a'],['b','f','a']]))
+from pympler import asizeof
+
+class Person:
+    __slots__ = ('name', '_health', '_damage', '_armor')
+    def __init__(self, name, health, damage, armor):
+        self._health = health
+        self.name = name
+        self._armor = armor
+        self._damage = damage
+
+    def strike_hits(self, target):
+        strike_result = int(self.get_damage()/target.get_armor())
+        target.set_health(strike_result)
+        return target.get_health()
+
+    def get_damage(self):
+        return self._damage
+
+    def get_armor(self):
+        return self._armor
+
+    def set_health(self, enemy_attack_force):
+        self._health = self._health - enemy_attack_force
+
+    def get_health(self):
+        return self._health
+
+    def get_name(self):
+        return self.name
+
+
+class Player(Person):
+    __slots__ = ('name', '_health', '_damage', '_armor')
+    def light_force(self):
+        print("Да пребудет с тобой сила")
+
+    def cure_force(self):
+        print("Исцеляйся!")
+
+
+class Enemy(Person):
+    __slots__ = ('name', '_health', '_damage', '_armor')
+    def dark_force(self):
+        print("Переходите на темную сторону! У нас есть печеньки!")
+
+
+class Fight:
+    __slots__ = ('person1','person2')
+    def __init__(self, person1, person2):
+        self.person1 = person1
+        self.person2 = person2
+
+    def round(self):
+        print(self.person1.name, " vs ", self.person2.name)
+        i = 1
+        while True:
+            if i % 2 == 0:
+                #print(self.person1.get_name(), " kick ", self.person2.get_name())
+                hit = self.person1.strike_hits(self.person2)
+                #print(hit)
+                if hit < 0:
+                    winner = self.person1
+                    break
+            else:
+                #print(self.person2.get_name(), " kick ", self.person1.get_name())
+                hit = self.person2.strike_hits(self.person1)
+                #print(hit)
+                if hit < 0:
+                    winner = self.person2
+                    break
+            i += 1
+        return f'{winner.get_name()} Win, strikes - {i}'
+
+
+djedi = Player(name="Luk", health=105, damage=20, armor=1.8)
+
+
+sitkh = Enemy(name="sitkh1", health=100, damage=30, armor=1.3)
+print(asizeof.asizeof(djedi))
+print(asizeof.asizeof(sitkh))
+
+#print(sitkh.__dict__)
+#print(djedi.__dict__)
+
+fight = Fight(djedi, sitkh)
+
+
+print(fight.round())
 
