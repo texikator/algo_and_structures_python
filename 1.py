@@ -1,62 +1,63 @@
 """
-1. Отсортируйте по убыванию методом "пузырька" одномерный целочисленный массив,
-заданный случайными числами на промежутке [-100; 100). Выведите на экран
-исходный и отсортированный массивы. Сортировка должна быть реализована в
-виде функции. По возможности доработайте алгоритм (сделайте его умнее).
+1. Закодируйте любую строку из трех слов по алгоритму Хаффмана.
 """
-import random
-import cProfile
-import timeit
-#array = [random.randrange(-100, 100) for i in range(-100, 100)]
-array = [-29, 36, -12, 11, 68, 75, -24, -22, 82, 25, -14, 98, -46, -88, 95, -41, 98, 92, -33, 75, 92, 9, -88, -30, 94, 76, 99, -8, 20, 9, 12, 90, 4, \
-    -76, -58, 16, 1, -58, -80, -49, 42, -9, -90, -23, 33, 14, 23, 29, 23, 34, -97, -36, 4, 71, -83, -51, -77, -52, 62, 42, 99, -59, -100, -76, -62, -60, \
-    85, -71, -61, 11, 84, 41, 3, 30, -8, 41, -35, -14, 82, -6, -31, -59, 69, -12, -39, 24, -51, 84, -46, -50, -21, 20, 95, -10, -3, -4, -49, -63, -97, \
-    71, -94, 96, -48, 44, 59, -17, -23, -61, 3, -46, 74, 86, -20, 41, -93, -48, -76, 34, -53, 69, -87, 56, -98, -92, -25, -38, 34, 30, 39, -22, 76, 60, \
-    -29, 79, -21, 58, 16, 22, 80, 19, -13, 69, 92, -1, 94, -41, -80, 33, -51, -83, -98, -10, 42, -27, -74, -27, 28, -52, 85, -10, -99, 68, 47, -96, -69, \
-    71, -67, -86, 50, 64, 85, 58, -48, 46, 71, -83, 16, 28, 95, 96, -36, 99, 88, -12, -32, -23, -94, -27, -5, 31, 26, 33, -22, -49, -32, -25, 84, -51, \
-    -70, 54]
 
-#array = [ 1,2,5,6,7,9,8,10]
-
-print(f'Исходный массив {array}')
+from collections import Counter
+from collections import deque
 
 
-def booble_sort(array=array):
-    n = 1
-    j = 0
-    iterations = 0 
-    while n < len(array):
-        cnt = 0
-        
-        for i in range(len(array)-n):
-            if array[i] > array[i+1]:
-                array[i],array[i+1] = array[i+1],array[i]
-                cnt += 1
-            j += 1
-        iterations += 1
-        if cnt == 0:
-            #break
-            pass
-        n += 1
-        
-    #print(f'Циклов всего: {j}, Кооличество прохода по массиву{iterations}')
-    return array
+
+s = "hello to all"
 
 
-print(f'Result: {booble_sort(array)}')
+def tree(s):
 
-# без оптимизации:
-# Циклов всего: 19900, Кооличество прохода по массиву199
-#с оптимизацией
-# Циклов всего: 19690, Кооличество прохода по массиву 179
-#cProfile.run('booble_sort()')
-#без оптимизации
-#   ncalls  tottime  percall  cumtime  percall filename: lineno(function)
-#         1    0.002    0.002    0.002    0.002 1.py: 21(booble_sort)
-#         1    0.000    0.000    0.002    0.002 < string > : 1( < module > )
-#         1    0.000    0.000    0.002    0.002 {built-in method builtins.exec}
-#       399    0.000    0.000    0.000    0.000 {built-in method builtins.len}
-#         1    0.000    0.000    0.000    0.000 {built-in method builtins.print}
-#         1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+    freq_basic = Counter(s)
+    sorted_elements = deque(sorted(freq_basic.items(), key=lambda item: item[1]))
+    print(sorted_elements)
+    if len(sorted_elements) != 1:
+    #print(sorted_elements)
+        while len(sorted_elements) > 1:
+            freak = sorted_elements[0][1] + sorted_elements[1][1]
 
-print(timeit.timeit('booble_sort(array)', setup='from __main__ import booble_sort, array', number=100))
+            print(freak)
+
+            comb = { 0: sorted_elements.popleft()[0],
+                     1: sorted_elements.popleft()[0]
+                     }
+
+            for item, _count in enumerate(sorted_elements):
+                print(item, _count)
+                if freak  > _count[1]:
+                    continue
+
+                else:
+                    sorted_elements.insert(item, (comb, freak))
+                    break
+        else:
+            sorted_elements.append((comb, freak))
+
+    else:
+        frek = sorted_elements[0][1]
+        comb = {0: sorted_elements.popleft()[0], 1: None}
+        sorted_elements.append((comb, freak))
+
+    return sorted_elements[0][0]
+
+
+code_table = dict()
+
+def haffman_code(tree, path=''):
+    if not isinstance(tree, dict):
+        code_table[tree] = path
+    else:
+        haffman_code(tree[0], path=f'{path}0')
+        haffman_code(tree[1], path=f'{path}1')
+haffman_code(tree(s))
+
+
+for i in s:
+    print(code_table[i], end=' ')
+print()
+
+
