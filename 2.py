@@ -1,124 +1,68 @@
 """
-2. Создать пользовательский класс данных (или использовать) один из классов,
-реализованных в курсе Python.Основы. Реализовать класс с применением слотов
-и обычным способом. Для объекта обычного класса проверить отображение словаря
-атрибутов. Сравнить, сколько выделяется памяти для хранения атрибутов обоих
-классов.
+2. Отсортируйте по возрастанию методом слияния одномерный вещественный массив,
+заданный случайными числами на промежутке [0; 50). Выведите на экран исходный
+и отсортированный массивы.
 """
-# 
-# .__dict__
-# {'_health': 100, 'name': 'sitkh1', '_armor': 1.3, '_damage': 30}
-# {'_health': 105, 'name': 'Luk', '_armor': 1.8, '_damage': 20}
-# память - 536
-# со слотами - 344 если их прописать только в родительком классе или только в дочерних классах и 248 если прописать их и там и там,
-#  экономия в 2+ раза. Использование слотов в классе, описывающем взаимодействие классов игроков не влияет на использование памяти.
-#
-# Если прописать слоты для родительского или дочернего классов, __dict__ для них выдает пустой словарь, при прописании слотов и там и там __dict__ отсутствует
-#  и наблюдается максимальная эффективность 
-#
-# если слоты явно не указаны на всех уровнях наследования, автоматом присутствует __dict__ ?
-# 
-#  Задача - 1
-# Ранее мы с вами уже писали игру, используя словари в качестве
-# структур данных для нашего игрока и врага, давайте сделаем новую, но уже с ООП
-# Опишите базовый класс Person, подумайте какие общие данные есть и у врага и у игрока
-# Не забудьте, что у них есть помимо общих аттрибутов и общие методы.
-# Теперь наследуясь от Person создайте 2 класса Player, Enemy.
-# У каждой сущности должы быть аттрибуты health, damage, armor
-# У каждой сущности должно быть 2 метода, один для подсчета урона, с учетом брони противника,
-# второй для атаки противника.
-# Функция подсчета урона должна быть инкапсулирована
-# Вам надо описать игровой цикл так же через класс.
-# Создайте экземпляры классов, проведите бой. Кто будет атаковать первым оставляю на ваше усмотрение.
-#
-#
 
-from pympler import asizeof
+import random
+import timeit
 
-class Person:
-    __slots__ = ('name', '_health', '_damage', '_armor')
-    def __init__(self, name, health, damage, armor):
-        self._health = health
-        self.name = name
-        self._armor = armor
-        self._damage = damage
+array = [random.randrange(0, 50) for i in range(500)]
 
-    def strike_hits(self, target):
-        strike_result = int(self.get_damage()/target.get_armor())
-        target.set_health(strike_result)
-        return target.get_health()
-
-    def get_damage(self):
-        return self._damage
-
-    def get_armor(self):
-        return self._armor
-
-    def set_health(self, enemy_attack_force):
-        self._health = self._health - enemy_attack_force
-
-    def get_health(self):
-        return self._health
-
-    def get_name(self):
-        return self.name
+array = [-29, 36, -12, 11, 68, 75, -24, -22, 82, 25, -14, 98, -46, -88, 95, -41, 98, 92, -33, 75, 92, 9, -88, -30, 94, 76, 99, -8, 20, 9, 12, 90, 4,
+         -76, -58, 16, 1, -58, -80, -49, 42, -9, -90, -23, 33, 14, 23, 29, 23, 34, -
+         97, -36, 4, 71, -83, -51, -77, -52, 62, 42, 99, -59, -100, -76, -62, -60,
+         85, -71, -61, 11, 84, 41, 3, 30, -8, 41, -35, -14, 82, -6, -31, -59, 69, -
+         12, -39, 24, -51, 84, -46, -50, -21, 20, 95, -10, -3, -4, -49, -63, -97,
+         71, -94, 96, -48, 44, 59, -17, -23, -61, 3, -46, 74, 86, -20, 41, -93, -
+         48, -76, 34, -53, 69, -87, 56, -98, -92, -25, -38, 34, 30, 39, -22, 76, 60,
+         -29, 79, -21, 58, 16, 22, 80, 19, -13, 69, 92, -1, 94, -41, -80, 33, -51, -
+         83, -98, -10, 42, -27, -74, -27, 28, -52, 85, -10, -99, 68, 47, -96, -69,
+         71, -67, -86, 50, 64, 85, 58, -48, 46, 71, -83, 16, 28, 95, 96, -36, 99, 88, -
+         12, -32, -23, -94, -27, -5, 31, 26, 33, -22, -49, -32, -25, 84, -51,
+         -70, 54]
 
 
-class Player(Person):
-    __slots__ = ('name', '_health', '_damage', '_armor')
-    def light_force(self):
-        print("Да пребудет с тобой сила")
 
-    def cure_force(self):
-        print("Исцеляйся!")
+print(f'Исходный массив: {array}')
 
 
-class Enemy(Person):
-    __slots__ = ('name', '_health', '_damage', '_armor')
-    def dark_force(self):
-        print("Переходите на темную сторону! У нас есть печеньки!")
+def get_sorted(orig_array):
+    if len(orig_array) > 1:
+        center = len(orig_array) // 2
+        left_array = orig_array[:center]
+        right_array = orig_array[center:]
 
+        get_sorted(left_array)
+        get_sorted(right_array)
 
-class Fight:
-    __slots__ = ('person1','person2')
-    def __init__(self, person1, person2):
-        self.person1 = person1
-        self.person2 = person2
+        i, j, k = 0, 0, 0
+        
+        while i < len(left_array) and j < len(right_array):
 
-    def round(self):
-        print(self.person1.name, " vs ", self.person2.name)
-        i = 1
-        while True:
-            if i % 2 == 0:
-                #print(self.person1.get_name(), " kick ", self.person2.get_name())
-                hit = self.person1.strike_hits(self.person2)
-                #print(hit)
-                if hit < 0:
-                    winner = self.person1
-                    break
+            if left_array[i] < right_array[j]:
+                orig_array[k] = left_array[i]
+                i += 1
             else:
-                #print(self.person2.get_name(), " kick ", self.person1.get_name())
-                hit = self.person2.strike_hits(self.person1)
-                #print(hit)
-                if hit < 0:
-                    winner = self.person2
-                    break
+                orig_array[k] = right_array[j]
+                j += 1
+            k += 1
+
+        while i < len(left_array):
+            orig_array[k] = left_array[i]
+
             i += 1
-        return f'{winner.get_name()} Win, strikes - {i}'
+            k += 1
 
+        while j < len(right_array):
+            
+            orig_array[k] = right_array[j]
+            j += 1
+            k += 1
 
-djedi = Player(name="Luk", health=105, damage=20, armor=1.8)
+    return orig_array
 
+print(f'Отсортированный массив {get_sorted(array)}')
 
-sitkh = Enemy(name="sitkh1", health=100, damage=30, armor=1.3)
-print(asizeof.asizeof(djedi))
-print(asizeof.asizeof(sitkh))
-
-#print(sitkh.__dict__)
-#print(djedi.__dict__)
-
-fight = Fight(djedi, sitkh)
-
-
-print(fight.round())
+print(timeit.timeit('get_sorted(array)', setup='from __main__ import get_sorted, array', number=100))
 
